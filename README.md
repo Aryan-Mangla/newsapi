@@ -1,6 +1,3 @@
-Here is the **full `README.md`** in Markdown format based on your request:
-
-```markdown
 # **News Search API**
 
 This repository contains a news search application built with Flask for the backend, a search module to process news articles, and a basic frontend for interacting with the API. Additionally, it includes a scraper to fetch news articles and save them for later use.
@@ -24,7 +21,6 @@ It includes the following functionalities:
   Example cURL request:
   ```bash
   curl "http://localhost:5000/search?q=technology"
-  ```
 
 - **`/list-sources`**:  
   Lists all available JSON files (news sources) in the `scrapes` directory.  

@@ -153,4 +153,10 @@ def search_news(search_term, json_file_path=None, sort_by='date', sort_order='de
     
     return search_result
 
+
+# Test the search_news function 
+search_results = search_news('trump', sort_by='length', sort_order='asc')
+with open ('search_results.json', 'w') as f:
+    json.dump(search_results, f, indent=2)
+
     

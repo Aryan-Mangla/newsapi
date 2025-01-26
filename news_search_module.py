@@ -4,6 +4,8 @@ import sys
 import re
 from datetime import datetime
 
+os.system('clear')
+
 def whole_word_search(search_term, text):
     """
     Perform a whole word search.
@@ -128,7 +130,7 @@ def search_news(search_term, json_file_path=None, sort_by='date', sort_order='de
     # Sorting logic
     if sort_by == 'date':
         matching_articles.sort(
-            key=lambda x: x['_parsed_date'] or datetime.min, 
+            key=lambda x: x['published_date'] or datetime.min, 
             reverse=(sort_order == 'desc')
         )
     elif sort_by == 'length':
@@ -150,7 +152,5 @@ def search_news(search_term, json_file_path=None, sort_by='date', sort_order='de
     }
     
     return search_result
-if __name__ == '__main__':
-    # Example usage
-    search_results = search_news('Saif ali khan', sort_by='date')
-    print(json.dumps(search_results, indent=2, ensure_ascii=False))
+
+    

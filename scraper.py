@@ -196,7 +196,15 @@ def main():
     rss_feed_urls = [
         "https://feeds.feedburner.com/ndtvnews-top-stories",  # NDTV Top Stories RSS feed
         "https://www.thehindu.com/news/national/feeder/default.rss",  # The Hindu National News RSS feed
-        "https://www.news18.com/commonfeeds/v1/eng/rss/india.xmll"  # News18 India RSS feed
+        "https://www.news18.com/commonfeeds/v1/eng/rss/india.xmll",
+        "https://www.livemint.com/rss/news",
+        "https://www.indiatoday.in/rss/home",
+        "https://www.indiatoday.in/rss/1206584",
+        "https://news.un.org/feed/subscribe/en/news/all/rss.xml",
+        "https://www.news18.com/commonfeeds/v1/eng/rss/india.xml",
+        "https://www.news18.com/commonfeeds/v1/eng/rss/world.xml",
+        "https://www.news18.com/commonfeeds/v1/eng/rss/movies.xml",
+        "https://www.news18.com/commonfeeds/v1/eng/rss/elections.xml"
     ]
     
     # Scrape the articles from multiple feeds

@@ -1,114 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>News Search</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f4;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
-
-    .container {
-      text-align: center;
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      width: 90%;
-      max-width: 600px;
-    }
-
-    h1 {
-      margin-bottom: 20px;
-      color: #333;
-    }
-
-    input[type="text"] {
-      width: 80%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      margin-bottom: 20px;
-    }
-
-    button {
-      padding: 10px 20px;
-      border: none;
-      background-color: #007BFF;
-      color: white;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    button:hover {
-      background-color: #0056b3;
-    }
-
-    .output {
-      margin-top: 20px;
-      text-align: left;
-      max-height: 300px;
-      overflow-y: auto;
-      border: 1px solid #ddd;
-      padding: 10px;
-      background: #f9f9f9;
-      border-radius: 4px;
-    }
-
-    pre {
-      white-space: pre-wrap;
-      word-wrap: break-word;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .container {
+            text-align: center;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 800px;
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .search-controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        input, select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="text"] {
+            width: 250px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .output {
+            margin-top: 20px;
+            text-align: left;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Search News Articles</h1>
-    <input type="text" id="searchInput" placeholder="Enter search term" />
-    <button onclick="searchNews()">Search</button>
-    <div class="output" id="output"></div>
-  </div>
+    <div class="container">
+        <h1>News Search</h1>
+        <div class="search-controls">
+            <input type="text" id="searchInput" placeholder="Enter search term" />
+            <select id="sortBy">
+                <option value="date">Sort by Date</option>
+                <option value="length">Sort by Length</option>
+            </select>
+            <select id="sortOrder">
+                <option value="desc">Descending</option>
+                <option value="asc">Ascending</option>
+            </select>
+            <input type="number" id="minLength" placeholder="Min Length" min="0" />
+            <input type="number" id="maxLength" placeholder="Max Length" min="0" />
+            <button onclick="searchNews()">Search</button>
+        </div>
+        <div class="output" id="output"></div>
+    </div>
 
-  <script>
+    <script>
     const searchNews = async () => {
-      const searchTerm = document.getElementById('searchInput').value.trim();
-      const output = document.getElementById('output');
+        const searchTerm = document.getElementById('searchInput').value.trim();
+        const sortBy = document.getElementById('sortBy').value;
+        const sortOrder = document.getElementById('sortOrder').value;
+        const minLength = document.getElementById('minLength').value;
+        const maxLength = document.getElementById('maxLength').value;
+        const output = document.getElementById('output');
 
-      // Clear previous output
-      output.innerHTML = '';
+        // Clear previous output
+        output.innerHTML = '';
 
-      if (!searchTerm) {
-        output.innerHTML = `<p style="color: red;">Please enter a search term!</p>`;
-        return;
-      }
-
-      try {
-        // Make a GET request to the backend
-        const response = await fetch(`http://127.0.0.1:5000/search?q=${encodeURIComponent(searchTerm)}`);
-        
-        if (!response.ok) {
-          throw new Error(`Error: ${response.statusText}`);
+        if (!searchTerm) {
+            output.innerHTML = `<p style="color: red;">Please enter a search term!</p>`;
+            return;
         }
 
-        // Parse JSON response
-        const data = await response.json();
+        try {
+            // Construct URL with parameters
+            const url = new URL('http://127.0.0.1:5000/search');
+            url.searchParams.append('q', searchTerm);
+            url.searchParams.append('sort_by', sortBy);
+            url.searchParams.append('sort_order', sortOrder);
 
-        // Display the response
-        output.innerHTML = `<h3>Response:</h3><pre>${JSON.stringify(data, null, 2)}</pre>`;
-      } catch (error) {
-        output.innerHTML = `<p style="color: red;">An error occurred: ${error.message}</p>`;
-      }
+            // Only add length parameters if they're not empty
+            if (minLength) {
+                url.searchParams.append('min_length', minLength);
+            }
+            if (maxLength) {
+                url.searchParams.append('max_length', maxLength);
+            }
+
+            // Make a GET request to the backend
+            const response = await fetch(url.toString());
+
+            if (!response.ok) {
+                throw new Error(`Error: ${response.statusText}`);
+            }
+
+            // Parse JSON response
+            const data = await response.json();
+
+            // Display the response
+            output.innerHTML = `<h3>Results (${data.total_articles} articles):</h3>
+                <pre>${JSON.stringify(data, null, 2)}</pre>`;
+        } catch (error) {
+            output.innerHTML = `<p style="color: red;">An error occurred: ${error.message}</p>`;
+        }
     };
-  </script>
+</script>
 </body>
 </html>

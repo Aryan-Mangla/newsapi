@@ -2,6 +2,7 @@ import json
 import os
 import sys
 import re
+from datetime import datetime
 
 def whole_word_search(search_term, text):
     """
@@ -14,33 +15,55 @@ def whole_word_search(search_term, text):
     Returns:
         bool: True if whole word match found, False otherwise
     """
-    # Create a regex pattern that matches whole words
-    # This ensures the search term is matched as a complete word
     pattern = r'\b' + re.escape(search_term.lower()) + r'\b'
     return bool(re.search(pattern, text.lower()))
 
-def search_news(search_term, json_file_path=None):
+def parse_date(date_str):
     """
-    Search news articles based on a user-provided search term.
+    Parse date string into datetime object.
+    
+    Args:
+        date_str (str): Date string to parse
+    
+    Returns:
+        datetime: Parsed datetime object or None if parsing fails
+    """
+    date_formats = [
+        '%Y-%m-%d', '%d/%m/%Y', '%m/%d/%Y', 
+        '%B %d, %Y', '%d %B %Y', '%Y %B %d'
+    ]
+    
+    for fmt in date_formats:
+        try:
+            return datetime.strptime(date_str, fmt)
+        except (ValueError, TypeError):
+            continue
+    return None
+
+def search_news(search_term, json_file_path=None, sort_by='date', sort_order='desc', 
+                min_length=0, max_length=float('inf')):
+    """
+    Search and sort news articles based on various parameters.
     
     Args:
         search_term (str): Term to search for in articles
         json_file_path (str, optional): Path to the JSON file containing scraped articles
+        sort_by (str, optional): Parameter to sort by. Options: 'date', 'length', 'popularity'
+        sort_order (str, optional): Sort order. Options: 'asc' (ascending), 'desc' (descending)
+        min_length (int, optional): Minimum article length to include
+        max_length (int, optional): Maximum article length to include
     
     Returns:
-        dict: Search results in JSON-compatible format
+        dict: Sorted and filtered search results in JSON-compatible format
     """
-    # Normalize search term (trim whitespace)
+    # Normalize search term
     search_term = search_term.strip()
     
-    # Find the most recent JSON file in the scrapes directory
+    # Find the most recent JSON file
     if not json_file_path:
         try:
-            # List all files in the scrapes directory
             scrapes_dir = 'scrapes'
             json_files = [f for f in os.listdir(scrapes_dir) if f.endswith('.json')]
-            
-            # Sort files by modification time, get the most recent
             json_files.sort(key=lambda x: os.path.getmtime(os.path.join(scrapes_dir, x)), reverse=True)
             
             if not json_files:
@@ -72,10 +95,9 @@ def search_news(search_term, json_file_path=None):
             "error": f"Error reading JSON file: {str(e)}"
         }
     
-    # Search results container
+    # Search and filter articles
     matching_articles = []
     
-    # Search through articles
     for article in articles:
         # Combine searchable fields
         searchable_text = ' '.join([
@@ -85,27 +107,46 @@ def search_news(search_term, json_file_path=None):
             str(article.get('author', ''))
         ])
         
-        # Check if search term is a whole word in the searchable text
+        # Whole word search
         if whole_word_search(search_term, searchable_text):
-            matching_articles.append({
-                "title": article.get('title', ''),
-                "link": article.get('link', ''),
-                "summary": article.get('summary', ''),
-                "full_content": article.get('full_content', ''),
-                "author": article.get('author', ''),
-                "source": article.get('source', ''),
-                "published_date": article.get('published_date', ''),
-                "url_to_image": article.get('url_to_image', '')
-            })
+            # Length filtering
+            content_length = len(str(article.get('full_content', '')))
+            if min_length <= content_length <= max_length:
+                matching_articles.append({
+                    "title": article.get('title', ''),
+                    "link": article.get('link', ''),
+                    "summary": article.get('summary', ''),
+                    "full_content": article.get('full_content', ''),
+                    "author": article.get('author', ''),
+                    "source": article.get('source', ''),
+                    "published_date": article.get('published_date', ''),
+                    "url_to_image": article.get('url_to_image', ''),
+                    "_content_length": content_length,
+                    "_parsed_date": parse_date(article.get('published_date', ''))
+                })
+    
+    # Sorting logic
+    if sort_by == 'date':
+        matching_articles.sort(
+            key=lambda x: x['_parsed_date'] or datetime.min, 
+            reverse=(sort_order == 'desc')
+        )
+    elif sort_by == 'length':
+        matching_articles.sort(
+            key=lambda x: x['_content_length'], 
+            reverse=(sort_order == 'desc')
+        )
+    
+    # Remove internal sorting keys
+    for article in matching_articles:
+        article.pop('_content_length', None)
+        article.pop('_parsed_date', None)
     
     # Prepare final result
     search_result = {
         "total_articles": len(matching_articles),
         "search_term": search_term,
         "articles": matching_articles
-        
-        
-        
     }
     
-    return search_result 
+    return search_result

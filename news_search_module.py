@@ -103,7 +103,7 @@ def search_news(search_term, json_file_path=None, sort_by='date', sort_order='de
         searchable_text = ' '.join([
             str(article.get('title', '')),
             str(article.get('summary', '')),
-            str(article.get('full_content', '')),
+            # str(article.get('full_content', '')),
             str(article.get('author', ''))
         ])
         
@@ -150,3 +150,7 @@ def search_news(search_term, json_file_path=None, sort_by='date', sort_order='de
     }
     
     return search_result
+if __name__ == '__main__':
+    # Example usage
+    search_results = search_news('Saif ali khan', sort_by='date')
+    print(json.dumps(search_results, indent=2, ensure_ascii=False))

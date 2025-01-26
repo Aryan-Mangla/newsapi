@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>News Search</title>
     <style>
-        body {
+         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
@@ -87,60 +87,67 @@
             </select>
             <input type="number" id="minLength" placeholder="Min Length" min="0" />
             <input type="number" id="maxLength" placeholder="Max Length" min="0" />
+            <input type="date" id="filterDate" placeholder="Filter Date" />
             <button onclick="searchNews()">Search</button>
         </div>
         <div class="output" id="output"></div>
     </div>
 
     <script>
-    const searchNews = async () => {
-        const searchTerm = document.getElementById('searchInput').value.trim();
-        const sortBy = document.getElementById('sortBy').value;
-        const sortOrder = document.getElementById('sortOrder').value;
-        const minLength = document.getElementById('minLength').value;
-        const maxLength = document.getElementById('maxLength').value;
-        const output = document.getElementById('output');
+        const searchNews = async () => {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            const sortBy = document.getElementById('sortBy').value;
+            const sortOrder = document.getElementById('sortOrder').value;
+            const minLength = document.getElementById('minLength').value;
+            const maxLength = document.getElementById('maxLength').value;
+            const filterDate = document.getElementById('filterDate').value;
+            const output = document.getElementById('output');
 
-        // Clear previous output
-        output.innerHTML = '';
+            // Clear previous output
+            output.innerHTML = '';
 
-        if (!searchTerm) {
-            output.innerHTML = `<p style="color: red;">Please enter a search term!</p>`;
-            return;
-        }
-
-        try {
-            // Construct URL with parameters
-            const url = new URL('http://127.0.0.1:5000/search');
-            url.searchParams.append('q', searchTerm);
-            url.searchParams.append('sort_by', sortBy);
-            url.searchParams.append('sort_order', sortOrder);
-
-            // Only add length parameters if they're not empty
-            if (minLength) {
-                url.searchParams.append('min_length', minLength);
-            }
-            if (maxLength) {
-                url.searchParams.append('max_length', maxLength);
+            if (!searchTerm) {
+                output.innerHTML = `<p style="color: red;">Please enter a search term!</p>`;
+                return;
             }
 
-            // Make a GET request to the backend
-            const response = await fetch(url.toString());
+            try {
+                // Construct URL with parameters
+                const url = new URL('http://127.0.0.1:5000/search');
+                url.searchParams.append('q', searchTerm);
+                url.searchParams.append('sort_by', sortBy);
+                url.searchParams.append('sort_order', sortOrder);
 
-            if (!response.ok) {
-                throw new Error(`Error: ${response.statusText}`);
+                // Only add length parameters if they're not empty
+                if (minLength) {
+                    url.searchParams.append('min_length', minLength);
+                }
+                if (maxLength) {
+                    url.searchParams.append('max_length', maxLength);
+                }
+                
+                // Add date filter if provided
+                if (filterDate) {
+                    url.searchParams.append('filter_date', filterDate);
+                }
+
+                // Make a GET request to the backend
+                const response = await fetch(url.toString());
+
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.statusText}`);
+                }
+
+                // Parse JSON response
+                const data = await response.json();
+
+                // Display the response
+                output.innerHTML = `<h3>Results (${data.total_articles} articles):</h3>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                output.innerHTML = `<p style="color: red;">An error occurred: ${error.message}</p>`;
             }
-
-            // Parse JSON response
-            const data = await response.json();
-
-            // Display the response
-            output.innerHTML = `<h3>Results (${data.total_articles} articles):</h3>
-                <pre>${JSON.stringify(data, null, 2)}</pre>`;
-        } catch (error) {
-            output.innerHTML = `<p style="color: red;">An error occurred: ${error.message}</p>`;
-        }
-    };
-</script>
+        };
+    </script>
 </body>
 </html>

@@ -4,7 +4,9 @@ from flask_cors import CORS
 from news_search_module import search_news
 from flask import Response
 import json
+import datetime
 
+# Create Flask app
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
 CORS(app)  # Enable CORS for all routes
@@ -38,6 +40,8 @@ def search_endpoint():
         else:
             max_length = float('inf')
 
+        # Parse date filter
+        filter_date = request.args.get('filter_date')
     except ValueError:
         return jsonify({
             "error": "Invalid length parameters. Must be integers or 'Infinity'.",
@@ -74,7 +78,8 @@ def search_endpoint():
             sort_by=sort_by, 
             sort_order=sort_order,
             min_length=min_length, 
-            max_length=max_length
+            max_length=max_length,
+            filter_date=filter_date
         )
         
         # Return results as JSON response
@@ -87,6 +92,8 @@ def search_endpoint():
             "error": str(e),
             "status": "error"
         }), 500
+
+# ... rest of the code remains the same
 
 def main():
     # Ensure scrapes directory exists

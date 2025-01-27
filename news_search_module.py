@@ -161,3 +161,5 @@ def search_news(search_term, json_file_path=None, sort_by='date', sort_order='de
     }
     
     return search_result
+
+

@@ -202,9 +202,20 @@ def main():
         "https://www.indiatoday.in/rss/1206584",
         "https://news.un.org/feed/subscribe/en/news/all/rss.xml",
         "https://www.news18.com/commonfeeds/v1/eng/rss/india.xml",
-        "https://www.news18.com/commonfeeds/v1/eng/rss/world.xml",
         "https://www.news18.com/commonfeeds/v1/eng/rss/movies.xml",
-        "https://www.news18.com/commonfeeds/v1/eng/rss/elections.xml"
+        "https://www.news18.com/commonfeeds/v1/eng/rss/elections.xml",
+        "https://www.theguardian.com/world/rss",
+        "https://globalnews.ca/feed/",
+        "https://globalnews.ca/world/feed/",
+        "https://feeds.bbci.co.uk/news/world/rss.xml",
+        "https://www.cnbc.com/id/100727362/device/rss/rss.html",
+        "https://abcnews.go.com/abcnews/internationalheadlines",
+        "https://www.aljazeera.com/xml/rss/all.xml",
+        "https://feeds.washingtonpost.com/rss/world",
+        "https://feeds.feedburner.com/time/world",
+        "https://www.washingtontimes.com/rss/headlines/news/world",
+        "https://www.latimes.com/world/rss2.0.xml"
+
     ]
     
     # Scrape the articles from multiple feeds
